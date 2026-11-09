@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório de Criptografia e Segurança</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #ffd700;
+            border-bottom: 2px solid rgba(255,215,0,0.5);
+            padding-bottom: 8px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        button {
+            background: #ffd700;
+            color: #1e3c72;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+            transition: transform 0.2s, background 0.2s;
+        }
+        button:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+        }
+        .resultado {
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            min-height: 20px;
+        }
+        .alerta {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .sucesso {
+            color: #51cf66;
+            font-weight: bold;
+        }
+        .info {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        .badge {
+            display: inline-block;
+            background: #51cf66;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .badge.vermelho {
+            background: #ff6b6b;
+        }
+        ul li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Laboratório de Criptografia e Segurança</h1>
+
+        <!-- ===================== CRIPTOGRAFIA POR SUBSTITUIÇÃO ===================== -->
+        <div class="card">
+            <h2>1. Criptografia por Substituição (Cifra de César)</h2>
+            <label for="textoCifra">Mensagem:</label>
+            <textarea id="textoCifra" placeholder="Digite a mensagem..."></textarea>
+
+            <label for="deslocamento">Deslocamento (chave): <span id="valorDesloc">3</span></label>
+            <input type="range" id="deslocamento" min="1" max="25" value="3"
+                   oninput="document.getElementById('valorDesloc').textContent = this.value">
+
+            <button onclick="cifrar()">🔒 Cifrar</button>
+            <button onclick="decifrar()">🔓 Decifrar</button>
+
+            <div class="resultado" id="resultadoCifra">Resultado aparecerá aqui...</div>
+        </div>
+
+        <!-- ===================== FUNÇÕES HASH ===================== -->
+        <div class="card">
+            <h2>2. Funções Hash (Aplicação em Senhas)</h2>
+            <label for="senhaHash">Digite uma senha:</label>
+            <input type="text" id="senhaHash" placeholder="Ex: minhaSenha123">
+
+            <button onclick="gerarHash()"># Gerar Hash</button>
+            <button onclick="compararHash()">✓ Verificar Senha</button>
+
+            <div class="resultado" id="resultadoHash">O hash aparecerá aqui...</div>
+
+            <div class="info">
+                💡 <strong>Boas práticas:</strong> Nunca armazene senhas em texto puro. Use hash com <em>salt</em>.
+                Em sistemas reais, utilize algoritmos como <strong>bcrypt</strong>, <strong>scrypt</strong> ou <strong>Argon2</strong>.
+                Este exemplo usa SHA-256 (apenas didático).
+            </div>
+        </div>
+
+        <!-- ===================== FORÇA BRUTA ===================== -->
+        <div class="card">
+            <h2>3. Simulação de Ataque de Força Bruta</h2>
+            <label for="senhaAlvo">Senha a ser "quebrada" (use senhas simples para teste):</label>
+            <input type="text" id="senhaAlvo" value="abc" maxlength="4" placeholder="Ex: abc">
+
+            <label for="tamanhoMax">Tamanho máximo do alfabeto testado:</label>
+            <select id="tamanhoMax">
+                <option value="26">Apenas letras minúsculas (26)</option>
+                <option value="36">Letras minúsculas + números (36)</option>
+                <option value="52">Letras maiúsc. + minúsc. (52)</option>
+            </select>
+
+            <button onclick="simularForcaBruta()">⚡ Iniciar Ataque</button>
+            <div class="resultado" id="resultadoForca">Aguardando simulação...</div>
+        </div>
+
+        <!-- ===================== BOAS PRÁTICAS ===================== -->
+        <div class="card">
+            <h2>4. Boas Práticas de Segurança da Informação</h2>
+            <ul>
+                <li><strong>Use senhas fortes:</strong> mínimo 12 caracteres, misturando maiúsculas, minúsculas, números e símbolos.</li>
+                <li><strong>Nunca reutilize senhas</strong> entre serviços diferentes.</li>
+                <li><strong>Ative autenticação em dois fatores (2FA)</strong> sempre que possível.</li>
+                <li><strong>Armazene senhas com hash + salt</strong> (bcrypt, Argon2).</li>
+                <li><strong>Use HTTPS</strong> para proteger dados em trânsito.</li>
+                <li><strong>Mantenha sistemas atualizados</strong> para evitar vulnerabilidades conhecidas.</li>
+                <li><strong>Princípio do menor privilégio:</strong> conceda apenas as permissões necessárias.</li>
+                <li><strong>Limite tentativas de login</strong> para dificultar ataques de força bruta.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 1. CRIPTOGRAFIA POR SUBSTITUIÇÃO (CIFRA DE CÉSAR)
+        //    Aplica estruturas condicionais e de repetição
+        // ============================================================
+        function cesar(texto, deslocamento) {
+            let resultado = "";
+            // Estrutura de repetição: percorre cada caractere
+            for (let i = 0; i < texto.length; i++) {
+                let char = texto[i];
+                let codigo = texto.charCodeAt(i);
+
+                // Estruturas condicionais: verifica se é letra
+                if (codigo >= 65 && codigo <= 90) {
+                    // Letra maiúscula
+                    resultado += String.fromCharCode(((codigo - 65 + deslocamento + 26) % 26) + 65);
+                } else if (codigo >= 97 && codigo <= 122) {
+                    // Letra minúscula
+                    resultado += String.fromCharCode(((codigo - 97 + deslocamento + 26) % 26) + 97);
+                } else {
+                    // Outros caracteres permanecem iguais
+                    resultado += char;
+                }
+            }
+            return resultado;
+        }
+
+        function cifrar() {
+            const texto = document.getElementById('textoCifra').value;
+            const desloc = parseInt(document.getElementById('deslocamento').value);
+            document.getElementById('resultadoCifra').textContent =
+                cesar(texto, desloc) || "(vazio)";
+        }
+
+        function decifrar() {
+            const texto = document.getElementById('textoCifra').value;
+            const desloc = parseInt(document.getElementById('deslocamento').value);
+            document.getElementById('resultadoCifra').textContent =
+                cesar(texto, -desloc) || "(vazio)";
+        }
+
+        // ============================================================
+        // 2. FUNÇÕES HASH (SHA-256 simplificado com Web Crypto API)
+        // ============================================================
+        let ultimoHash = "";
+
+        async function sha256(mensagem) {
+            const encoder = new TextEncoder();
+            const dados = encoder.encode(mensagem);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dados);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function gerarHash() {
+            const senha = document.getElementById('senhaHash').value;
+            if (!senha) {
+                document.getElementById('resultadoHash').innerHTML =
+                    '<span class="alerta">Digite uma senha primeiro.</span>';
+                return;
+            }
+            // Salt aleatório (boa prática)
+            const salt = crypto.getRandomValues(new Uint8Array(8))
+                .reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
+            const hash = await sha256(salt + senha);
+            ultimoHash = hash;
+            document.getElementById('resultadoHash').innerHTML =
+                `<strong>Salt:</strong> ${salt}<br>
+                 <strong>Hash (SHA-256):</strong> ${hash}<br>
+                 <span class="sucesso">✓ Hash gerado com salt aplicado.</span>`;
+        }
+
+        async function compararHash() {
+            const senha = document.getElementById('senhaHash').value;
+            if (!senha || !ultimoHash) {
+                document.getElementById('resultadoHash').innerHTML =
+                    '<span class="alerta">Gere um hash primeiro.</span>';
+                return;
+            }
+            // Recalcula usando o mesmo salt armazenado no hash exibido
+            const resultado = document.getElementById('resultadoHash').innerHTML;
+            const match = resultado.match(/Salt:<\/strong>\s*([a-f0-9]+)/);
+            if (!match) return;
+            const salt = match[1];
+            const novoHash = await sha256(salt + senha);
+            if (novoHash === ultimoHash) {
+                document.getElementById('resultadoHash').innerHTML +=
+                    `<br><span class="sucesso">✓ Senha correta! Hash coincide.</span>`;
+            } else {
+                document.getElementById('resultadoHash').innerHTML +=
+                    `<br><span class="alerta">✗ Senha incorreta!</span>`;
+            }
+        }
+
+        // ============================================================
+        // 3. SIMULAÇÃO DE ATAQUE DE FORÇA BRUTA
+        //    Usa loops aninhados e condicionais para tentar senhas
+        // ============================================================
+        function simularForcaBruta() {
+            const alvo = document.getElementById('senhaAlvo').value;
+            const tipo = parseInt(document.getElementById('tamanhoMax').value);
+            const resultado = document.getElementById('resultadoForca');
+
+            if (!alvo) {
+                resultado.innerHTML = '<span class="alerta">Defina uma senha alvo.</span>';
+                return;
+            }
+
+            // Define alfabeto conforme escolha
+            let alfabeto = "abcdefghijklmnopqrstuvwxyz";
+            if (tipo === 36) alfabeto += "0123456789";
+            if (tipo === 52) alfabeto += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            resultado.innerHTML = "🔄 Tentando combinações...";
+
+            // Executa de forma assíncrona para não travar a UI
+            setTimeout(() => {
+                const inicio = performance.now();
+                let tentativas = 0;
+                let encontrada = false;
+
+                // Loop de tamanhos de 1 até 6 (limitado para não travar o navegador)
+                const maxLen = Math.min(alvo.length, 6);
+
+                for (let len = 1; len <= maxLen && !encontrada; len++) {
+                    const indices = new Array(len).fill(0);
+                    while (true) {
+                        // Monta a string candidata
+                        let candidato = "";
+                        for (let i = 0; i < len; i++) {
+                            candidato += alfabeto[indices[i]];
+                        }
+                        tentativas++;
+
+                        // Condicional de comparação
+                        if (candidato === alvo) {
+                            encontrada = true;
+                            break;
+                        }
+
+                        // Incrementa o "contador" de índices (como números)
+                        let pos = len - 1;
+                        while (pos >= 0) {
+                            indices[pos]++;
+                            if (indices[pos] < alfabeto.length) break;
+                            indices[pos] = 0;
+                            pos--;
+                        }
+                        if (pos < 0) break; // esgotou combinações desse tamanho
+
+                        // Limite de segurança para não travar o navegador
+                        if (tentativas > 5000000) {
+                            resultado.innerHTML =
+                                `<span class="alerta">⚠ Limite de 5 milhões de tentativas atingido.</span>`;
+                            return;
+                        }
+                    }
+                }
+
+                const tempo = (performance.now() - inicio).toFixed(2);
+
+                if (encontrada) {
+                    resultado.innerHTML =
+                        `<span class="sucesso">✓ Senha encontrada: "${alvo}"</span><br>
+                         <strong>Tentativas:</strong> ${tentativas.toLocaleString('pt-BR')}<br>
+                         <strong>Tempo:</strong> ${tempo} ms<br>
+                         <span class="info">Isso mostra por que senhas curtas/simples são vulneráveis!</span>`;
+                } else {
+                    resultado.innerHTML =
+                        `<span class="alerta">✗ Senha não encontrada dentro dos limites da simulação.</span><br>
+                         Tentativas: ${tentativas.toLocaleString('pt-BR')} | Tempo: ${tempo} ms`;
+                }
+            }, 50);
+        }
+    </script>
+</body>
+</html>
